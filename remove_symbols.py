@@ -30,7 +30,7 @@ def main():
             query = query.strip(' -.')
             # remove double spaces
             query = re.sub("\s\s+", " ", query)
-            print (query, len(query))
+            print (query)
     except IndexError:
         print ("Enter a query")
 
