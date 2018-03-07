@@ -14,7 +14,7 @@ def main():
         if len(sys.argv) > 2:
             print ("Please enter only 1 text string query")
         else:
-            query = sys.argv[1]
+            query = sys.argv[1].lower()
             # remove '_' in any case except spu_orb 
             if 'spu_orb' not in query:
                 query = re.sub(r'_', ' ', query)
