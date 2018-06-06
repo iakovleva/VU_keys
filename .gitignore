@@ -2,6 +2,7 @@ geckodriver.log
 tokens.py
 
 *.json
+*.xlsx
 *.xls
 
 *.pyc
