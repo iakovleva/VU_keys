@@ -5,7 +5,7 @@ import enchant
 
 d = enchant.Dict("ru-RU")
 
-wb = openpyxl.load_workbook('bufer.xlsx')
+wb = openpyxl.load_workbook('Вычесть.xlsx')
 sh = wb.get_sheet_by_name('Sheet1')
 
 for i in range(1, sh.max_row):
@@ -13,4 +13,4 @@ for i in range(1, sh.max_row):
     if d.check(string):
         sh.cell(row=i, column=2).value = "True"
 
-wb.save('bufer.xlsx')
+wb.save('Вычесть.xlsx')

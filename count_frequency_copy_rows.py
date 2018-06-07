@@ -18,7 +18,7 @@ def count_frequency(fl):
 
     # Create Counter for all words in column
     for i in range(1, sh.max_row):
-            cell = sh.cell(row=i, column=1).value
+            cell = sh.cell(row=i, column=6).value
             if cell is not None:
                 for word in str(cell).split():
                     cnt[word.lower()] += 1
@@ -26,10 +26,10 @@ def count_frequency(fl):
     # Check if each common word is in each keyword phrase, create new row with all
     # data about kw plus a column with commom word in this phrase
     new_row_start = 2
-    for k, v in cnt.most_common(40):
-        print(k)
+    for k, v in cnt.most_common(100):
+#        print(k, v)
         for i in range(1, sh.max_row):
-            cell = sh.cell(row=i, column=1).value
+            cell = sh.cell(row=i, column=6).value
             if cell is not None:
                 if k in str(cell).lower().split():
                     sh2.cell(row=new_row_start, column=1).value = sh.cell(row=i, column=1).value
