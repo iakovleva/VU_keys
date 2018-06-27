@@ -87,6 +87,7 @@ abbr_list = [
 
 def main(query):
     print("Content-type:text/html\r\n\r\n")
+    query = query.lower()
     q1 = remove_symbols(query)
     q2 = remove_phones(q1)
     q3 = remove_cities(q2)
@@ -131,7 +132,6 @@ def remove_cities(query):
     pattern = r"(^|\s+)((?:%s)\s+)*((?:%s)\.?\s?)*(?:%s)\b" % (
         "|".join(preposition_list), "|".join(gorod_list), "|".join(city_list_sorted))
 
-    query = query.lower()
     match = re.search(pattern, query)
     if match:
         query = query.replace(match.group(), '')
@@ -145,8 +145,6 @@ def remove_regions(query):
     pattern = r"(^|\s+)((?:%s)\s+)*(?:%s)\b" % (
         "|".join(preposition_list), "|".join(region_list_sorted)
         )
-
-    query = query.lower()
     match = re.search(pattern, query)
     if match:
         query = query.replace(match.group(), '')
