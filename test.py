@@ -4,7 +4,7 @@
 from urllib.parse import urlencode
 import subprocess
 import unittest
-import tokens
+import tokens, cleanup
 
 
 sentence = {
@@ -38,18 +38,25 @@ sentence = {
 
 
 class Test(unittest.TestCase):
-    def test(self):
+    def test_main(self):
         for key, value in sentence.items():
-            args = [
-                'curl',
-                '{}/cgi-bin/cleanup.py?{}'.format(
-                    tokens.local_server,
-                    urlencode({'query': key})
-                )
-            ]
-            modified_key = subprocess.check_output(args).decode()
-            self.assertIn(value, modified_key)
+            with self.subTest():
+                args = [
+                    'curl',
+                    '{}/cgi-bin/cleanup.py?{}'.format(
+                        tokens.local_server,
+                        urlencode({'query': key})
+                    )
+                ]
+                modified_key = subprocess.check_output(args).decode()
+                self.assertIn(value, modified_key)
 
+    def test_remove_symbols(self):
+#        sent = sentence[8:10]
+        for key, value in sentence.items():
+            with self.subTest():
+                keyword = cleanup.remove_symbols(key)
+                self.assertEqual(value, keyword)
 
 if __name__ == '__main__':
     unittest.main()

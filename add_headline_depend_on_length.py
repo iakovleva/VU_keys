@@ -4,10 +4,11 @@
 import sys
 import openpyxl
 import re
+import tokens
 
 def insert_headline(fl):
     wb_data = openpyxl.load_workbook(fl)
-    wb_example = openpyxl.load_workbook(filename)
+    wb_example = openpyxl.load_workbook(tokens.filename)
     ws_data = wb_data.active
     ws = wb_example.active
 
