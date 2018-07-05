@@ -35,11 +35,14 @@ sentence = {
     '8(912)62-32-555': '',
     '8912.623.25.55': '8912.623.25.55',
     'как добраться в евпаторию': 'как добраться',
-    'получить внж гражданину казахстана': 'получить ВНЖ гражданину Казахстана',
+    'получить внж гражданину казахстана': 'получить ВНЖ гражданину',
     'получить дмс': 'получить ДМС',
     'внж россии': 'ВНЖ России',
 }
 
+
+remote = '{}/cgi-bin/cleanup.py?'.format(tokens.remote_server)#, urlencode({'query': key}))
+local = '{}/VU_keys/cleanup.py?'.format(tokens.remote_server)#, urlencode({'query': key}))
 
 class Test(unittest.TestCase):
     def test_main(self):
@@ -47,10 +50,7 @@ class Test(unittest.TestCase):
             with self.subTest():
                 args = [
                     'curl',
-                    '{}/VU_keys/cleanup.py?{}'.format(
-                        tokens.local_server,
-                        urlencode({'query': key})
-                    )
+                    '{}{}'.format(remote, urlencode({'query': key}))
                 ]
                 modified_key = subprocess.check_output(args).decode()
                 self.assertIn(value, modified_key)
