@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from urllib.parse import urlencode
@@ -34,6 +34,10 @@ sentence = {
     '8-912-623-2555': '',
     '8(912)62-32-555': '',
     '8912.623.25.55': '8912.623.25.55',
+    'как добраться в евпаторию': 'как добраться',
+    'получить внж гражданину казахстана': 'получить ВНЖ гражданину Казахстана',
+    'получить дмс': 'получить ДМС',
+    'внж россии': 'ВНЖ России',
 }
 
 
@@ -43,7 +47,7 @@ class Test(unittest.TestCase):
             with self.subTest():
                 args = [
                     'curl',
-                    '{}/cgi-bin/cleanup.py?{}'.format(
+                    '{}/VU_keys/cleanup.py?{}'.format(
                         tokens.local_server,
                         urlencode({'query': key})
                     )
@@ -52,7 +56,6 @@ class Test(unittest.TestCase):
                 self.assertIn(value, modified_key)
 
     def test_remove_symbols(self):
-#        sent = sentence[8:10]
         for key, value in sentence.items():
             with self.subTest():
                 keyword = cleanup.remove_symbols(key)
