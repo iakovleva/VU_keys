@@ -1,19 +1,55 @@
-#! /usr/bin/python
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
 
-import sys
+import cgi
+import sys, os
 import openpyxl
 from collections import Counter
 
-def main(fl, col, *args):
+
+HTML = """
+<html>
+<head>
+<title></title>
+</head>
+<body>
+  <h1>Upload File</h1>
+  <form action="count_frequency.py" method="POST" enctype="multipart/form-data">
+    File: <input name="file" type="file">
+    <input name="submit" type="submit">
+</form>
+
+{% if filedata %}
+<blockquote> {{filedata}} </blockquote>
+{% endif %}
+</body>
+</html>
+"""
+
+form = cgi.FieldStorage()
+UPLOAD_DIR='./uploads'
+#fl = form.getvalue('fl')
+uploaded_file = form['file']
+fl = os.path.join(UPLOAD_DIR, os.path.basename(uploaded_file.filename))
+col = form.getvalue('col')
+common = form.getvalue('common')
+all_data = form.getvalue('all_data')
+
+
+def main(col, common, all_data):
+    print("Content-type: text/html\r\n\r\n")
+    print(HTML)
+    print(fl)
     wb = openpyxl.load_workbook(fl)
     sh = wb.active
     sh2 = wb.create_sheet(title='Sheet1') # Create new sheet
     cnt = create_counter(sh, col)
     # Read arguments: common - number of most frequent words to display,
     # all_data - whether to write all columns or only words with occurences
-    for a in args:
-            common = int(args[0])
-            all_data = args[1]
+#    for a in args:
+#            common = int(args[0])
+#            all_data = args[1]
+    common = int(common)
     if all_data == 'True':
         copy_rows(sh, sh2, cnt, col, common)
     else:
@@ -110,5 +146,7 @@ def copy_rows(sh, sh2, cnt, col, common):
                         sh2.cell(row=row_num, column=17).value = sh.cell(row=i, column=16).value
                         row_num += 1
 
+
 if __name__ == '__main__':
-    main(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+#    main(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+    main(col, common, all_data)
