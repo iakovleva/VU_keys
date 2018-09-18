@@ -181,7 +181,4 @@ def change_abbr(query):
 
 
 if __name__ == '__main__':
-    import time
-    start_time = time.time()
     main(query)
-    print(" {} seconds ".format(time.time() - start_time))
