@@ -1,6 +1,3 @@
-#! /usr/bin/env python
-#coding: utf-8
-
 import json, requests
 
 
@@ -11,7 +8,6 @@ city_list = [
 
 new_city_list = []
 url = "https://ws3.morpher.ru/russian/declension"
-#print (city_list [504])
 
 for i in range(len(city_list)):
     s = city_list[i]

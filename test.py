@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 from urllib.parse import urlencode
 import subprocess
 import unittest
