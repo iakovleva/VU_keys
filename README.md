@@ -13,3 +13,11 @@ Receives a string as input, returns the same string with:
 regions in diffrerent cases.
 
 3. values.py contains ready lists of values that are passed to cleanup. 
+
+4. The script reads and writes from PostgreSQL DB, table 'keys'. Initial value - column 'key', updated value is written to the column 'newkey'.
+```
+CREATE TABLE keys(
+        key text,
+        source text,
+        newkey text);
+```
