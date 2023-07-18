@@ -1,36 +1,54 @@
 import re
-import values
-import psycopg2
+import cities
 
 
-def main(query):
-    """Apply functions to input query in certain order.
-    Input: string query.
-    Output: changed query.
-    """
-    q1 = remove_symbols(query.lower())
-    return change_abbr(remove_countries(remove_regions(remove_cities(remove_phones(q1)))))
+def main(query: str) -> str:
+    """Apply functions to input query in certain order.  """
+
+    return remove_countries(
+        remove_regions(
+            remove_cities(
+                remove_stop_words(
+                    replace_e(
+                        remove_symbols(query.lower()))))))
+
+
+def strip_words_to(number, query):
+    result = [word for word in query.split()]
+    return ' '.join(result[:number])
 
 
 def remove_symbols(query):
-    """Remove symbols according to the rules."""
+    """Remove all non-cyrillic symbols including numbers.
+       Leave the numbers if the article or law is mentioned.
+    """
 
-    # remove '_' in any case except spu_orb
-    if 'spu_orb' not in query:
-        query = re.sub(r'_', ' ', query)
-    # replace comma with space
-    if ',' in query:
-        query = re.sub(r',', ' ', query)
-    # remove other punctuation
-    for symbol in values.SYMBOL:
-        result = re.search(symbol, query)
-        if result:
-            query = re.sub(symbol, ' ', query)
-    # remove spaces, dots and dashes in the end and at the beginning
-    query = query.strip(' -.')
+    stopwords = ['статья', 'ст', 'фз', 'закон']
+    if any(word in query.split() for word in stopwords):
+        query = re.sub(r'[^а-я0-9^.]', ' ', query)
+    else:
+        query = re.sub(r'[^а-я]', ' ', query)
     # remove double spaces
     query = re.sub(r"\s\s+", " ", query)
     return query
+
+
+def replace_e(query):
+    return query.replace('ё', 'е')
+
+
+def remove_latin(query):
+    return re.sub(r"([a-zA-Z]+)", '', query)
+
+
+def remove_numbers(query):
+    return re.sub(r"([0-9]+)", ' ', query)
+
+
+def remove_stop_words(query):
+    from stopwords import STOP_WORDS
+
+    return " ".join(word for word in query.split() if word not in STOP_WORDS and len(word) < 22)
 
 
 def remove_phones(query):
@@ -45,21 +63,11 @@ def remove_phones(query):
 def remove_cities(query):
     """Remove the names of cities in all cases with prepositions. """
 
-# TODO Cache sorted lists
-    # Add cities with 'ё' replaced on 'e'
-    for city in values.CITY:
-        if 'ё' in city:
-            new_city = city.replace('ё', 'е')
-            values.CITY.append(new_city)
-
-    # sort city list alphabetically and by length starting from longest
-    city_list_sorted = sorted(sorted(values.CITY, key=len, reverse=True))
-
     # full search pattern
     pattern = r'(^|\s+)((?:%s)\s+)*((?:%s)\.?\s?)*(?:%s)\b' % (
-        "|".join(values.PREPOSITION),
-        "|".join(values.GOROD),
-        "|".join(city_list_sorted)
+        "|".join(cities.PREPOSITION),
+        "|".join(cities.GOROD),
+        "|".join(cities.CITIES)
     )
 
     match = re.search(pattern, query)
@@ -70,14 +78,11 @@ def remove_cities(query):
 
 def remove_regions(query):
     """Remove the names of regions in cases with prepositions. """
-
-# TODO Cache sorted lists
-    # sort list by length starting from longest
-    region_list_sorted = sorted(values.REGION, key=len, reverse=True)
+    import regions
 
     # full search pattern
     pattern = r'(^|\s+)((?:%s)\s+)*(?:%s)\b' % (
-        "|".join(values.PREPOSITION), "|".join(region_list_sorted)
+        "|".join(cities.PREPOSITION), "|".join(regions.REGIONS)
     )
     match = re.search(pattern, query)
     if match:
@@ -88,13 +93,11 @@ def remove_regions(query):
 def remove_countries(query):
     """Remove the names of countries in cases with prepositions. """
 
-# TODO Cache sorted lists
-    # sort list by length starting from longest
-    country_list_sorted = sorted(values.COUNTRY, key=len, reverse=True)
+    import countries
 
     # full search pattern
     pattern = r"(^|\s+)((?:%s)\s+)*(?:%s)\b" % (
-        "|".join(values.PREPOSITION), "|".join(country_list_sorted)
+        "|".join(cities.PREPOSITION), "|".join(countries.COUNTRIES)
     )
     match = re.search(pattern, query)
     if match:
@@ -104,27 +107,11 @@ def remove_countries(query):
 
 def change_abbr(query):
     """Replace incorrect abbreviations with correct ones. """
+    import abbrev
 
-    for abbr in values.ABBR:
+    for abbr in abbrev.ABBR:
         pattern = re.compile(r"\b%s\b" % abbr.lower())
         result = re.search(pattern, query)
         if result:
             query = re.sub(pattern, abbr, query)
     return query
-
-
-if __name__ == '__main__':
-    sql = "UPDATE keys SET newkey=%s where key=%s"
-    try:
-        conn = psycopg2.connect("host=localhost dbname=postgres user=postgres")
-        cur = conn.cursor()
-        cur.execute("SELECT * from keys where newkey is NULL")
-        for row in cur.fetchall():
-            new_key = main(row[0])
-            cur.execute(sql, (new_key, row[0]))
-            conn.commit()
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-    finally:
-        cur.close()
-        conn.close()
