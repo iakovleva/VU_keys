@@ -1,5 +1,5 @@
 import re
-import cities
+from data import cities
 
 
 def main(query: str) -> str:
@@ -46,7 +46,7 @@ def remove_numbers(query):
 
 
 def remove_stop_words(query):
-    from stopwords import STOP_WORDS
+    from data.stopwords import STOP_WORDS
 
     return " ".join(word for word in query.split() if word not in STOP_WORDS and len(word) < 22)
 
@@ -78,7 +78,7 @@ def remove_cities(query):
 
 def remove_regions(query):
     """Remove the names of regions in cases with prepositions. """
-    import regions
+    from data import regions
 
     # full search pattern
     pattern = r'(^|\s+)((?:%s)\s+)*(?:%s)\b' % (
@@ -93,7 +93,7 @@ def remove_regions(query):
 def remove_countries(query):
     """Remove the names of countries in cases with prepositions. """
 
-    import countries
+    from data import countries
 
     # full search pattern
     pattern = r"(^|\s+)((?:%s)\s+)*(?:%s)\b" % (
@@ -107,7 +107,7 @@ def remove_countries(query):
 
 def change_abbr(query):
     """Replace incorrect abbreviations with correct ones. """
-    import abbrev
+    from data import abbrev
 
     for abbr in abbrev.ABBR:
         pattern = re.compile(r"\b%s\b" % abbr.lower())
